@@ -57,8 +57,13 @@ Assert that the original object's id remains unchanged when the copy's id is mod
 Validation:
 The assertion verifies if the id is properly encapsulated and cannot be modified externally.
 Note: These test scenarios are written based on the given method's signature and the class-level information provided. Additional test scenarios can be created based on the actual class definition and its interactions with other classes and methods.
+roost_feedback [7/31/2024, 4:27:25 PM]:add vulnerability details
 */
+
 // ********RoostGPT********
+
+****RoostGPT****
+
 package com.bootexample4.products.model;
 
 import jakarta.persistence.Entity;
@@ -68,36 +73,59 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.*\;
 
 @Tag("com.bootexample4.products.model")
 @Tag("com.bootexample4.products.model.getId")
-public class ProductGetIdTest {
+public class ProductGetIdTest{
 
-	private Product product;
+private Product product;
+private Product originalProduct;
 
-	@BeforeEach
-	public void setup() {
-		product = new Product();
-	}
-
-	@Test
-	public void testIdIsNull() {
-		assertEquals(null, product.getId());
-	}
-
-	@Test
-	public void testIdIsAssignedAValue() {
-		product.setId(1L);
-		assertEquals(1L, product.getId());
-	}
-
-	@Test
-	public void testIdRemainsUnchangedWhenObjectIsCopied() {
-		Product copyProduct = new Product();
-		copyProduct.setId(product.getId());
-		product.setId(2L);
-		assertEquals(null, copyProduct.getId());
-	}
-
+@BeforeEach
+public void setup(){
+product = new Product();
+originalProduct = new Product();
 }
+
+@Test
+public void testIdIsNull(){
+assertEquals(null, product.getId());
+}
+
+@Test
+public void testIdIsAssignedAValue(){
+product.setId(1L);
+assertEquals(1L, product.getId());
+}
+
+@Test
+public void testIdRemainsUnchangedWhenObjectIsCopied(){
+Product copyProduct = new Product();
+copyProduct.setId(originalProduct.getId());
+originalProduct.setId(2L);
+assertEquals(null, copyProduct.getId());
+}
+
+@Test
+public void testIdIsGeneratedByPersistenceFramework(){
+// Arrange
+EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("test-pu");
+EntityManager entityManager = entityManagerFactory.createEntityManager();
+entityManager.getTransaction().begin();
+
+// Act
+product.setName("Test Product");
+entityManager.persist(product);
+entityManager.getTransaction().commit();
+
+// Assert
+assertNotNull(product.getId());
+assertEquals(GenerationType.AUTO, product.getId().getClass().getAnnotation(GeneratedValue.class).strategy());
+
+entityManager.close();
+entityManagerFactory.close();
+}
+}
+
+****RoostGPT****
